@@ -16,6 +16,7 @@ MEMORY_SIZE="8196" # in MB
 CPU_CORES="4"
 VM_ID="8001" # each template needs its own unique id
 APT_MIRROR="http://linux.yz.yamagata-u.ac.jp/ubuntu/" # default http://archive.ubuntu.com/ubuntu/
+ANSIBLE_PUBKEY_PATH="./ansible_ed25519.pub"
 
 
 IMAGE_FILENAME=$(basename "$IMAGE_URL")
@@ -64,11 +65,19 @@ packages:
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true
+ssh_pwauth: false
+user:
+  name: ansible
+  gecos: Ansible User
+  groups: sudo
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: /bin/bash
+  lock_passwd: true
+  ssh_authorized_keys:
+    - "$(cat "$ANSIBLE_PUBKEY_PATH")"
 EOF
 qm set "$VM_ID" --cicustom "vendor=local:snippets/vendor.yaml"
 qm set "$VM_ID" --tags ubuntu-template,cloudinit
-qm set "$VM_ID" --ciuser test
 qm set "$VM_ID" --cipassword $(openssl passwd -6 testpassword)
-qm set "$VM_ID" --sshkeys ~/.ssh/authorized_keys
 qm set "$VM_ID" --ipconfig0 ip=dhcp
 qm template "$VM_ID"
