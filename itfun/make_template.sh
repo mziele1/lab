@@ -13,7 +13,7 @@ IMAGE_SIZE="64" # in GB
 MEMORY_SIZE="8196" # in MB
 CPU_CORES="4"
 VM_ID="8001" # each template needs its own unique id
-APT_MIRROR="" # default http://archive.ubuntu.com/ubuntu/
+APT_MIRROR="http://linux.yz.yamagata-u.ac.jp/ubuntu/" # default http://archive.ubuntu.com/ubuntu/
 
 
 IMAGE_FILENAME=$(basename "$IMAGE_URL")
@@ -56,9 +56,13 @@ runcmd:
 EOF
 cat << EOF | tee /var/lib/vz/snippets/vendor.yaml
 #cloud-config
+apt:
+  primary:
+    - arches: [default]
+      uri: "$APT_MIRROR"
 autoinstall:
-    packages:
-        - qemu-guest-agent
+  packages:
+    - qemu-guest-agent
 EOF
 qm set "$VM_ID" --cicustom "vendor=local:snippets/vendor.yaml"
 qm set "$VM_ID" --tags ubuntu-template,cloudinit
