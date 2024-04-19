@@ -5,6 +5,8 @@
 # also use cloud-init for basic user/ssh initialization
 # see:
 #   https://github.com/UntouchedWagons/Ubuntu-CloudInit-Docs
+#   https://cloudinit.readthedocs.io/en/latest/reference/modules.html
+#   https://github.com/canonical/cloud-init/tree/main/doc/examples
 
 
 BUILD_DIR="./build/"
