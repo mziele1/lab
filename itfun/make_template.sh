@@ -24,6 +24,12 @@ IMAGE_PATH="${BUILD_DIR}/${IMAGE_FILENAME}"
 
 # delete anything with a conflicting id
 qm destroy "$VM_ID"
+DESTROY_STATUS=$?
+if [ $DESTROY_STATUS -ne 0 ] && [ $DESTROY_STATUS -ne 2 ]; then
+    echo "Make sure to full clone/delete any linked clones"
+    exit
+fi
+
 mkdir -p "$BUILD_DIR"
 #wget "$IMAGE_URL" -P "$BUILD_DIR"
 cp "$IMAGE_FILENAME" "$BUILD_DIR"
