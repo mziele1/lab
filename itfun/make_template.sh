@@ -47,22 +47,15 @@ qm set "$VM_ID" --boot order=virtio0
 mkdir -p /var/lib/vz/snippets # may not exist
 cat << EOF | tee /var/lib/vz/snippets/vendor.yaml
 #cloud-config
-runcmd:
-    - apt update
-    - apt install -y qemu-guest-agent
-    - systemctl start qemu-guest-agent
-    - reboot
-# Taken from https://forum.proxmox.com/threads/combining-custom-cloud-init-with-auto-generated.59008/page-3#post-428772
-EOF
-cat << EOF | tee /var/lib/vz/snippets/vendor.yaml
-#cloud-config
 apt:
   primary:
     - arches: [default]
       uri: "$APT_MIRROR"
-autoinstall:
-  packages:
-    - qemu-guest-agent
+packages:
+  - qemu-guest-agent
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
 EOF
 qm set "$VM_ID" --cicustom "vendor=local:snippets/vendor.yaml"
 qm set "$VM_ID" --tags ubuntu-template,cloudinit
