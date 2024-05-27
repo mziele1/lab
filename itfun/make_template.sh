@@ -75,6 +75,10 @@ user:
   lock_passwd: true
   ssh_authorized_keys:
     - "$(cat "$ANSIBLE_PUBKEY_PATH")"
+ansible:
+  install_method: distro # https://bugs.launchpad.net/ubuntu/+source/cloud-init/+bug/2040291
+  package_name: ansible
+  run_user: ansible
 EOF
 qm set "$VM_ID" --cicustom "vendor=local:snippets/vendor.yaml"
 qm set "$VM_ID" --tags ubuntu-template,cloudinit
