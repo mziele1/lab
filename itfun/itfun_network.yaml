@@ -1,0 +1,8 @@
+network:
+  version: 2
+  ethernets:
+    primary-interface:
+      match:
+        macaddress: bc:24:11:1a:27:97
+      dhcp4: true
+      dhcp-identifier: mac

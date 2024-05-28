@@ -44,7 +44,7 @@ qm create "$VM_ID" --name "itfun-ubuntu-cloudinit-template" --ostype l26 \
     --bios ovmf --machine q35 --efidisk0 local-zfs:0,pre-enrolled-keys=0 \
     --cpu host --socket 1 --cores "$CPU_CORES" \
     --vga serial0 --serial0 socket  \
-    --net0 virtio,bridge=vmbr0
+    --net0 virtio=BC:24:11:1A:27:97,bridge=vmbr0
 
 # configure disk/image/boot
 qm importdisk "$VM_ID" "$IMAGE_PATH" local-zfs
@@ -80,8 +80,8 @@ ansible:
   package_name: ansible
   run_user: ansible
 EOF
-qm set "$VM_ID" --cicustom "vendor=local:snippets/vendor.yaml"
+cp itfun_network.yaml /var/lib/vz/snippets/
+qm set "$VM_ID" --cicustom "network=local:snippets/itfun_network.yaml,vendor=local:snippets/vendor.yaml"
 qm set "$VM_ID" --tags ubuntu-template,cloudinit
 qm set "$VM_ID" --cipassword $(openssl passwd -6 testpassword)
 qm set "$VM_ID" --ipconfig0 ip=dhcp
-qm template "$VM_ID"
