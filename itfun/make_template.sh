@@ -21,6 +21,7 @@ ANSIBLE_PUBKEY_PATH="./ansible_ed25519.pub"
 
 IMAGE_FILENAME=$(basename "$IMAGE_URL")
 IMAGE_PATH="${BUILD_DIR}/${IMAGE_FILENAME}"
+RELEASE="${IMAGE_FILENAME%%-*}"
 
 
 # delete anything with a conflicting id
@@ -60,16 +61,31 @@ apt:
   primary:
     - arches: [default]
       uri: "$APT_MIRROR"
+  sources:
+    docker.list:
+      source: deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable
+      keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
 packages:
   - qemu-guest-agent
+  - dbus-user-session
+  - uidmap
+  - systemd-container
+  - docker-ce
+  - docker-ce-cli
+  - docker-ce-rootless-extras
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 ssh_pwauth: false
+groups:
+  docker
 user:
   name: ansible
   gecos: Ansible User
-  groups: sudo
+  groups: sudo, docker
   sudo: ALL=(ALL) NOPASSWD:ALL
   shell: /bin/bash
   lock_passwd: true
