@@ -1,0 +1,13 @@
+- name: User Setup
+  hosts: itfun
+  vars:
+    n_users: 4
+    users: "{{ ['user'] | product(range(1, n_users + 1)) | map('join') | list }}"
+  tasks:
+  - name: Add Users
+    ansible.builtin.user:
+      name: "{{ item }}"
+      password: "*"
+      shell: /bin/bash
+    loop: "{{ users }}"
+    become: true
