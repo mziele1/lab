@@ -41,3 +41,27 @@
       mode: "600"
     loop: "{{ openssh_keypair_return_values.results }}"
     become: true
+  - name: Get User Docker Service File Status
+    ansible.builtin.stat:
+      path: "/home/{{ item }}/.config/systemd/user/docker.service"
+    loop: "{{ users }}"
+    become: true
+    register: docker_service_stat_return_values
+  - name: Rootless Docker Install
+    ansible.builtin.shell: /usr/bin/dockerd-rootless-setuptool.sh install
+    loop: "{{ docker_service_stat_return_values.results }}"
+    become: true
+    become_user: "{{ item.item }}"
+    become_method: machinectl
+    become_exe: sudo machinectl
+    when: item.stat.exists == false
+  - name: Rootless Docker .bashrc Block
+    ansible.builtin.blockinfile:
+      path: "/home/{{ item.item }}/.bashrc"
+      block: |
+        export PATH=/usr/bin:$PATH
+        export "DOCKER_HOST=unix:///run/user/{{ item.uid }}/docker.sock"
+      owner: "{{ item.item }}"
+      group: "{{ item.item }}"
+    loop: "{{ user_return_values.results }}"
+    become: true

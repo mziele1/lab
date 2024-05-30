@@ -76,6 +76,7 @@ packages:
   - containerd.io
   - docker-buildx-plugin
   - docker-compose-plugin
+  - acl
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true
