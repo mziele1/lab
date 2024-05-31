@@ -65,3 +65,35 @@
       group: "{{ item.item }}"
     loop: "{{ user_return_values.results }}"
     become: true
+  - name: Stat conda Installation
+    ansible.builtin.stat:
+      path: "/opt/miniforge"
+    register: conda_stat
+  - name: Install conda
+    ansible.builtin.shell: |
+      wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O ~/miniforge.sh
+      bash ~/miniforge.sh -b -p /opt/miniforge
+      source /opt/miniforge/bin/activate
+      conda init --all
+      conda install scikit-learn jupyterlab matplotlib pandas numpy psycopg -y
+      rm ~/miniforge.sh
+    become: true
+    when: conda_stat.stat.exists == false
+  - name: Get User conda Init Status
+    ansible.builtin.lineinfile:
+      path: "/home/{{ item }}/.bashrc"
+      line: "# !! Contents within this block are managed by 'conda init' !!"
+    check_mode: true
+    loop: "{{ users }}"
+    become: true
+    register: user_conda_init_status
+  - name: User conda Init
+    ansible.builtin.shell: |
+      source /opt/miniforge/bin/activate
+      conda init
+    args:
+      executable: /bin/bash
+    loop: "{{ user_conda_init_status.results }}"
+    become: true
+    become_user: "{{ item.item }}"
+    when: item.changed == true
