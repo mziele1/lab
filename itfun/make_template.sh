@@ -15,7 +15,9 @@ IMAGE_SIZE="64" # in GB
 MEMORY_SIZE="8196" # in MB
 CPU_CORES="4"
 VM_ID="8001" # each template needs its own unique id
-APT_MIRROR="http://linux.yz.yamagata-u.ac.jp/ubuntu/" # default http://archive.ubuntu.com/ubuntu/
+APT_PRIMARY_MIRROR="http://ftp.udx.icscoe.jp/Linux/ubuntu/"
+APT_SECONDARY_MIRROR="http://linux.yz.yamagata-u.ac.jp/ubuntu/"
+APT_TERTIARY_MIRROR="http://archive.ubuntu.com/ubuntu/"
 ANSIBLE_PUBKEY_PATH="./ansible_ed25519.pub"
 
 
@@ -60,7 +62,10 @@ cat << EOF | tee /var/lib/vz/snippets/vendor.yaml
 apt:
   primary:
     - arches: [default]
-      uri: "$APT_MIRROR"
+      search:
+        - "$APT_PRIMARY_MIRROR"
+        - "$APT_SECONDARY_MIRROR"
+        - "$APT_TERTIARY_MIRROR"
   sources:
     docker.list:
       source: deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable
